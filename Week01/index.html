@@ -20,6 +20,12 @@
         </style>
     </head>
     <body>
+        <hgroup>
+            <h1>World Wide Web</h1>
+            <h2>From Wikipedia, the free encyclopedia</h2>
+        </hgroup>
+        <abbr>WWW</abbr>
+        <p>fsdfdshlkfhjalkfhalfajdhflajfhadsl</p>
         <div id="board"></div>
 
         <script>
@@ -28,7 +34,7 @@
                 [0, 0, 0],
                 [0, 0, 0],
             ];
-            let color = 1;
+            let color = 2;
             function show() {
                 let boardEl = document.getElementById("board");
                 boardEl.innerHTML = "";
@@ -56,9 +62,19 @@
                 }
                 color = 3 - color;
                 show();
-                if (willWin(clone(pattern), color)) {
+                computedMove();
+            }
+            function computedMove() {
+                const { point, result } = bestChoice(pattern, color);
+                if (point) {
+                    pattern[point[0]][point[1]] = color;
+                }
+                if (check(pattern, color)) {
                     alert(color === 2 ? "❌ is win" : "⭕️ is win");
                 }
+
+                color = 3 - color;
+                show();
             }
             function check(pattern, color) {
                 for (let i = 0; i < 3; i++) {
@@ -106,16 +122,51 @@
             function willWin(pattern, color) {
                 for (let i = 0; i < 3; i++) {
                     for (let j = 0; j < 3; j++) {
-                        let copy = clone(pattern);
                         // 有值
-                        if (copy[i][j]) continue;
+                        if (pattern[i][j]) continue;
                         // 没有值
+                        const copy = clone(pattern);
                         copy[i][j] = color;
-                        if (check(clone(copy), color)) return true;
+                        if (check(clone(copy), color)) return [i, j];
                     }
                 }
 
                 return false;
+            }
+
+            function bestChoice(pattern, color) {
+                let p;
+
+                // 递归跳出的条件
+                if ((p = willWin(pattern, color))) {
+                    return {
+                        point: p,
+                        result: 1,
+                    };
+                }
+
+                let result = -2;
+                let point = null;
+                outer: for (let i = 0; i < 3; i++) {
+                    for (let j = 0; j < 3; j++) {
+                        if (pattern[i][j]) continue;
+                        const copy = clone(pattern);
+                        copy[i][j] = color;
+                        const r = bestChoice(copy, 3 - color).result;
+                        if (-r > result) {
+                            result = -r;
+                            point = [i, j];
+                        }
+                        if (result === 1) {
+                            break outer;
+                        }
+                    }
+                }
+
+                return {
+                    point,
+                    result: point ? result : 0,
+                };
             }
             show();
         </script>
