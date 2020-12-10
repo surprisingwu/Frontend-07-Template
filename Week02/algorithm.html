@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <title>Document</title>
+    </head>
+    <body>
+        <script>
+            // 对称二叉树
+            var isSymmetric = function (root) {
+                const queue = [root, root];
+
+                while (queue.length) {
+                    const l = queue.shift();
+                    const r = queue.shift();
+
+                    if (l === null && r === null) continue;
+                    if (l === null || r === null) return false;
+                    if (l.val !== r.val) return false;
+
+                    queue.push(l.left);
+                    queue.push(r.right);
+                    queue.push(l.right);
+                    queue.push(r.left);
+                }
+                return true;
+            };
+
+            // 层序遍历 BFS
+            var levelOrder = function (root) {
+                if (root === null) return [];
+                const queue = [root];
+                let nodes = [];
+                while (queue.length) {
+                    const len = queue.length;
+                    nodes.push([]);
+                    while (len--) {
+                        node = queue.shift();
+                        nodes[nodes.length - 1].push(node);
+                        node.left && queue.push(node.left);
+                        node.right && queue.push(node.right);
+                    }
+                }
+
+                return nodes;
+            };
+
+            // 层序遍历  递归的思想  DFS
+
+            var levelOrder = function (root) {
+                if (!root) return [];
+                const ret = [];
+                helper(root, ret, 0);
+            };
+            function helper(root, ret, level) {
+                if (!root) return;
+                if (!ret[level]) {
+                    ret[level] = [];
+                }
+                ret[level].push(root.val);
+
+                root.left && helper(root.left, ret, level++);
+                root.right && helper(root.right, ret, level++);
+            }
+
+            // 二叉树的锯齿形层次遍历
+
+            var zigzagLevelOrder = function (root) {
+                if (root === null) return [];
+                const queue = [root];
+                let nodes = [];
+                while (queue.length) {
+                    const len = queue.length;
+                    const current = [];
+                    while (len--) {
+                        node = queue.shift();
+                        current.push(node.val);
+                        node.left && queue.push(node.left);
+                        node.right && queue.push(node.right);
+                    }
+
+                    nodes.push(nodes.length % 2 === 0 ? current : current.reverse());
+                }
+
+                return nodes;
+            };
+        </script>
+    </body>
+</html>
