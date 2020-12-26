@@ -107,7 +107,7 @@ function wildcard(source, pattern) {
 
   // 边界条件. 没有通配符
   if (starCount === 0) {
-    for (let i = 0; i < sourceLen; i++) {
+    for (let i = 0; i < patternLen; i++) {
       if (pattern[i] !== source[i] && pattern[i] !== "?") return false;
     }
     return true;
@@ -133,12 +133,12 @@ function wildcard(source, pattern) {
     const reg = new RegExp(subPattern.replace(/\?/g, "[\\s\\S]"), "g");
     reg.lastIndex = lastIndex;
 
-    console.log(reg.exec(source));
+    // console.log(reg.exec(source));
     if (!reg.exec(source)) return false;
 
     lastIndex = reg.lastIndex;
   }
-
+  if (lastIndex >= sourceLen) return false;
   for (let j = 0; j <= sourceLen - lastIndex && pattern[patternLen - j] !== "*"; j++) {
     if (pattern[patternLen - j] !== source[sourceLen - j] && pattern[patternLen - j] !== "?")
       return false;
@@ -147,4 +147,44 @@ function wildcard(source, pattern) {
   return true;
 }
 
-console.log(wildcard("mississippi", "m??*ss*?i*pi"));
+// console.log(wildcard("mississippi", "m??*ss*?i*pi"));
+
+// 算法练习
+var findNthDigit = function (n) {
+  for (let bit = 1; bit < 32; ++bit) {
+    const startNum = Math.pow(10, bit - 1);
+    const bitSum = 9 * startNum * bit;
+    if (n > bitSum) {
+      n -= bitSum;
+    } else {
+      let num = startNum + Math.ceil(n / bit) - 1;
+      let pos = n - bit * (num - startNum) - 1;
+      return num.toString(10)[pos];
+    }
+  }
+};
+
+// console.log(findNthDigit(8));
+
+var getLeastNumbers = function (arr, k) {
+  if (k === 0) return arr;
+  return arr.sort((a, b) => a - b).slice(0, k);
+};
+
+// 数组中数字出现的次数
+
+var singleNumbers = function (nums) {
+  const map = new Map();
+
+  for (let i = 0, len = nums.length; i < len; i++) {
+    if (map.has(nums[i])) {
+      map.delete(nums[i]);
+    } else {
+      map.set(nums[i], 1);
+    }
+  }
+  console.log(map);
+  return [...map.keys()];
+};
+
+console.log(singleNumbers([4, 1, 4, 6]));
