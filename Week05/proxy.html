@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Document</title>
+  </head>
+  <body>
+    <script>
+      // 收集注册
+      let usedReactWatchers = []
+      const callbacks = new Map()
+      const reactiveWatchers = new Map()
+
+
+      function effect(callback) {
+        usedReactWatchers = []
+
+        // 执行一次, 触发收集
+        callback()
+        console.log(usedReactWatchers)
+        for(let [object, prop] of usedReactWatchers) {
+          if(!callbacks.has(object)) {
+            callbacks.set(object, new Map())
+          }
+          if(!callbacks.get(object).has(prop)) {
+            callbacks.get(object).set(prop, [])
+          }
+          callbacks.get(object).get(prop).push(callback)
+        }
+      }
+      function reactive(obj) {
+        if(reactiveWatchers.has(obj)) return reactiveWatchers.get(obj)
+        const proxy =  new Proxy(obj, {
+          set(obj, prop, value) {
+            if (obj[prop] === value) return;
+            obj[prop] = value
+            if(callbacks.has(obj) && callbacks.get(obj).has(prop)) {
+              const _callbacks_ = callbacks.get(obj).get(prop) || []
+              _callbacks_.forEach(callback => {
+                callback()
+              })
+              
+            }
+            return obj[prop]
+          },
+          get(obj, prop) {
+            usedReactWatchers.push([obj, prop])
+            if(typeof obj[prop] === 'object') return reactive(obj[prop])
+            return obj[prop];
+          },
+        });
+
+        reactiveWatchers.set(obj, proxy)
+        return proxy
+      }
+      const test = {
+        a: {b: 3},
+        b: 2
+      }
+      const po = reactive(test)
+      effect(() => {
+        console.log(po.a.b)
+      })
+    </script>
+  </body>
+</html>
