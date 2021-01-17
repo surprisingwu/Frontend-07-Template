@@ -1,0 +1,259 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset='UTF-8'>
+    <title>JavaScript引擎里面Realm所有的对象</title>
+    <script src="https://gw.alipayobjects.com/os/antv/pkg/_antv.g6-3.1.0/build/g6.js"></script>
+</head>
+
+<body>
+    <div id="app"></div>
+    <script>
+        const data = {
+            children: [{
+                deep: 1,
+                id: '数据对象', 
+                label: '数据对象',
+                labelCfg: {
+                    position: 'left'
+                },
+                style: {
+                    fill: '#40a9ff',
+                    stroke: '#096dd9'
+                },
+                children: [
+                    {
+                        deep: 2,
+                        id: 'Number',
+                        label: 'Number',
+                        labelCfg: {
+                            position: 'left',
+                        },
+                        style: {
+                            fill: '#40a9ff',
+                            stroke: '#096dd9',
+                        },
+                    },
+                    {
+                        deep: 2,
+                        id: 'String',
+                        label: 'String',
+                        labelCfg: {
+                            position: 'left',
+                        },
+                        style: {
+                            fill: '#40a9ff',
+                            stroke: '#096dd9',
+                        },
+                    },
+                    {
+                        deep: 2,
+                        id: 'Boolean',
+                        label: 'Boolean',
+                        labelCfg: {
+                            position: 'left',
+                        },
+                        style: {
+                            fill: '#40a9ff',
+                            stroke: '#096dd9',
+                        },
+                    },
+                ],
+            },  {
+                deep: 1,
+                id: '组合对象', 
+                label: '组合对象',
+                labelCfg: {
+                    position: 'left'
+                },
+                style: {
+                    fill: '#40a9ff',
+                    stroke: '#096dd9'
+                },
+                children: [
+                        {
+                            deep: 2,
+                            id: 'Array',
+                            label: 'Array',
+                            labelCfg: {
+                                position: 'left',
+                            },
+                            style: {
+                                fill: '#40a9ff',
+                                stroke: '#096dd9',
+                            },
+                        },
+                        {
+                            deep: 2,
+                            id: 'Math',
+                            label: 'Math',
+                            labelCfg: {
+                                position: 'left',
+                            },
+                            style: {
+                                fill: '#40a9ff',
+                                stroke: '#096dd9',
+                            },
+                        },
+                        {
+                            deep: 2,
+                            id: 'Data',
+                            label: 'Data',
+                            labelCfg: {
+                                position: 'left',
+                            },
+                            style: {
+                                fill: '#40a9ff',
+                                stroke: '#096dd9',
+                            },
+                        },
+                    ],
+            }, {
+                deep: 1,
+                id: '高级对象', 
+                label: '高级对象',
+                labelCfg: {
+                    position: 'left'
+                },
+                style: {
+                    fill: '#40a9ff',
+                    stroke: '#096dd9'
+                },
+                children: [
+                        {
+                            deep: 2,
+                            id: 'Object',
+                            label: 'Object',
+                            labelCfg: {
+                                position: 'left',
+                            },
+                            style: {
+                                fill: '#40a9ff',
+                                stroke: '#096dd9',
+                            },
+                        },
+                        {
+                            deep: 2,
+                            id: 'Error',
+                            label: 'Error',
+                            labelCfg: {
+                                position: 'left',
+                            },
+                            style: {
+                                fill: '#40a9ff',
+                                stroke: '#096dd9',
+                            },
+                        },
+                        {
+                            deep: 2,
+                            id: 'Global',
+                            label: 'Global',
+                            labelCfg: {
+                                position: 'left',
+                            },
+                            style: {
+                                fill: '#40a9ff',
+                                stroke: '#096dd9',
+                            },
+                        },
+                        {
+                        deep: 2,
+                        id: 'Function',
+                        label: 'Function',
+                        labelCfg: {
+                            position: 'left',
+                        },
+                        style: {
+                            fill: '#40a9ff',
+                            stroke: '#096dd9',
+                        },
+                    },
+                        {
+                        deep: 2,
+                        id: 'RegExp',
+                        label: 'RegExp',
+                        labelCfg: {
+                            position: 'left',
+                        },
+                        style: {
+                            fill: '#40a9ff',
+                            stroke: '#096dd9',
+                        },
+                    },
+                    ],
+            }],
+            deep: 0,
+            id: 'Realm', 
+            label: 'Realm',
+            labelCfg: {
+                position: 'left'
+            },
+            style: {
+                fill: '#40a9ff',
+                stroke: '#096dd9'
+            },
+            x: 0,
+            y: 908,
+        };
+        const graph = new G6.TreeGraph({
+            container: 'app', 
+            width: 800,
+            height: 500,
+            defaultNode: {
+                anchorPoints: [
+                    [0, 0.5],
+                    [1, 0.5]
+                ],
+                style: {
+                    fill: '#40a9ff',
+                    stroke: '#096dd9'
+                }
+            },
+            defaultEdge: {
+                shape: 'cubic-horizontal',
+                style: {
+                    stroke: '#A3B1BF'
+                }
+            },
+            layout: {
+                type: 'compactBox',
+                direction: 'LR',
+                getId: function getId(d) {
+                    return d.id;
+                },
+                getHeight: function getHeight() {
+                    return 16;
+                },
+                getWidth: function getWidth() {
+                    return 16;
+                },
+                getVGap: function getVGap() {
+                    return 10;
+                },
+                getHGap: function getHGap() {
+                    return 100;
+                }
+            },
+        });
+        graph.node(function (node) {
+            return {
+                size: 15,
+                style: {
+                    fill: '#40a9ff',
+                    stroke: '#096dd9'
+                },
+                label: node.id,
+                labelCfg: {
+                    position: node.children && node.children.length > 0 ? 'left' : 'right'
+                }
+            };
+        });
+        // 渲染数据
+        graph.data(data);
+        graph.render();
+        graph.fitView();
+    </script>
+</body>
+
+</html>
