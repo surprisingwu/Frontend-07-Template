@@ -1,5 +1,5 @@
+const parser = require('./parser')
 const net = require('net')
-const { threadId } = require('worker_threads')
 
 class Request {
   constructor(options) {
@@ -214,6 +214,6 @@ void async function () {
   });
 
   const response = await request.send()
-
-  console.log(response);
+  let dom = parser.parseHtml(response.body)
+  console.log(dom);
 }();
