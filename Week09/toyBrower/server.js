@@ -13,7 +13,7 @@ http.createServer((request, response) => {
 
     console.log('body:', body);
     response.writeHead(200, {'Content-Type': 'text/html'})
-    response.end(`<html maaa=a >
+    response.end(`<html maaa='a' >
     <head>
       <style>
       body div #myid{
