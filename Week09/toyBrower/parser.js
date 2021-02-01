@@ -8,7 +8,7 @@ let currentTextNode = null;
 
 let rules = [];
 function addCSSRules(text) {
-  var ast = css.parse(text);
+  const ast = css.parse(text);
   // console.log(JSON.stringify(ast, null, "   "));
   rules.push(...ast.stylesheet.rules);
 }
@@ -171,10 +171,11 @@ function data(c) {
     })
   } else {
     // 文本节点
-    return emit({
+     emit({
       type: 'text',
       content: c
-    })
+     })
+    
     return data
   }
 }
@@ -191,7 +192,10 @@ function tagOpen(c) {
     }
     return tagName(c)
   } else {
-    return
+    return emit({
+      type: 'text',
+      content:c
+    })
   }
 }
 function tagName(c) {
@@ -206,6 +210,7 @@ function tagName(c) {
     emit(currentToken)
     return data
   } else {
+    currentToken.tagName += c
     return tagName
   }
 }
@@ -217,7 +222,7 @@ function beforeAttributeName(c) {
   } else if (c === '=') {
     return beforeAttributeName
   } else {
-    currentToken = {
+    currentAttribute = {
       name: '',
       value: ''
     }
@@ -236,7 +241,7 @@ function attributeName(c) {
   } else if (c === '\'' || c === "'" || c === '<') {
     
   } else {
-    currentToken.name += c
+    currentAttribute.name += c
     return attributeName
   }
 }
@@ -257,7 +262,7 @@ function beforeAttributeValue(c) {
 
 function doubleQuoteAttributeValue(c) {
   if (c === "\"") {
-    currentToken[currentToken.name] = currentAttribute.value
+    currentToken[currentAttribute.name] = currentAttribute.value
     return afterAttributeValue
   } else if (c === '\u0000') {
     
@@ -270,8 +275,8 @@ function doubleQuoteAttributeValue(c) {
 }
 function singleQuoteAttributeValue(c) {
   if (c === "\'") {
-    currentToken[currentToken.name] = currentAttribute.value
-    return afterAttributeValue
+    currentToken[currentAttribute.name] = currentAttribute.value
+    return afterQuoteAttributeValue
   } else if (c === '\u0000') {
     
   } else if (c === EOF) {
@@ -282,9 +287,6 @@ function singleQuoteAttributeValue(c) {
   }
 }
 function UnquoteAttributeValue(c) {
-
-}
-function afterAttributeName(c) {
   if (c.match(/^[\t\n\f ]$/)) {
     currentToken[currentAttribute.name] = currentAttribute.value
     return beforeAttributeName
@@ -292,7 +294,7 @@ function afterAttributeName(c) {
     currentToken[currentAttribute.name] = currentAttribute.value
     return selfClosingStartTag
   } else if (c === '>') {
-    currentToken[currentToken.name] = currentAttribute.value
+    currentToken[currentAttribute.name] = currentAttribute.value
     emit(currentToken)
     return data
   } else if (c === '\u0000') {
@@ -302,8 +304,28 @@ function afterAttributeName(c) {
   } else if (c === EOF) {
     
   } else {
-    currentToken.value += c
-    return UnquoteAttributeValue
+    currentAttribute.value += c
+    return doubleQuoteAttributeValue
+  }
+}
+function afterQuoteAttributeValue(c) {
+  if (c.match(/^[\t\n\f ]$/)) {
+    return beforeAttributeName
+  } else if (c === '/') {
+    return selfClosingStartTag
+  } else if (c === '>') {
+    currentToken[currentAttribute.name] = currentAttribute.value
+    emit(currentToken)
+    return data
+  } else if (c === '\u0000') {
+    
+  } else if (c === "\"" || c === "'" || c === "<" || c === "=" || c === "`") {
+    
+  } else if (c === EOF) {
+    
+  } else {
+    currentAttribute.value += c
+    return doubleQuoteAttributeValue
   }
 }
 
@@ -334,6 +356,29 @@ function endTagOpen(c) {
   }
 }
 
+function afterAttributeName(c) {
+  if (c.match(/^[\t\n\f ]$/)) {
+    return afterAttributeName
+  } else if (c === '/') {
+    return selfClosingStartTag
+  } else if (c === '=') {
+    return beforeAttributeValue
+  } else if (c === '>') {
+    currentToken[currentAttribute.name] = currentAttribute.value
+    emit(currentToken)
+    return dta
+  } else if (c === EOF) {
+    
+  } else {
+    currentToken[currentAttribute.name] = currentAttribute.value
+    currentAttribute = {
+      name: '',
+      value:''
+    }
+
+    return attributeName(c)
+  }
+}
 
 function parseHtml(html) {
   let state = data
@@ -343,6 +388,7 @@ function parseHtml(html) {
   }
 
   state = state(EOF)
+  return stack[0]
 }
 
 module.exports = {
