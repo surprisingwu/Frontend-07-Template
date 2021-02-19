@@ -1,3 +1,4 @@
+const layout = require('./layout.js')
 const css = require("css");
 const EOF = Symbol("EOF"); // End of File
 let currentToken = null;
@@ -147,6 +148,7 @@ function emit(token) {
       if (top.tagName == "style") {
         addCSSRules(top.children[0].content);
       }
+      layout(top)
       stack.pop();
     }
     currentTextNode = null;
