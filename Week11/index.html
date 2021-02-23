@@ -1,0 +1,142 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Document</title>
+</head>
+<body>
+  <div class="test">
+    <span class="txt">hello world</span>
+    <div id="app">
+      <span class="a"></span>
+    </div>
+  </div>
+
+  <script>
+
+   function match(selector, element) {
+    let matched = false;
+    let selector_reg = /(\*)|(\w+)|(\.\w+)|(\#\w+)/g;
+    //拆分复杂选择器
+    if (selector.indexOf(">") > -1) {
+      let selector_array = selector.split(">");
+      let cur_ss = selector_array[selector_array.length - 1].match(selector_reg);
+      //判断当前元素
+      matched = matchElement(cur_ss, element);
+      if (matched) {
+        // 判断父元素
+        let parent_ss = selector_array[selector_array.length - 2].match(selector_reg);
+        matched = matchElement(parent_ss, element.parentNode);
+      }
+
+    } else if (selector.indexOf("+") > -1) {
+      let selector_array = selector.split("+");
+      let cur_ss = selector_array[selector_array.length - 1].match(selector_reg);
+      //判断当前元素
+      matched = matchElement(cur_ss, element);
+      // 判断相邻元素
+      if (matched) {
+        let pre_ss = selector_array[selector_array.length - 2].match(selector_reg);
+        matched = matchElement(pre_ss, element.previousElementSibling);
+      }
+
+
+    } else if (selector.indexOf("~") > -1) {
+      let selector_array = selector.split("~");
+      let selector_groups = [];
+      // array = [div, #id.class];
+      for (let i = 0; i < selector_array.length; i++) {
+        let ss = selector_array[i].match(selector_reg);
+        selector_groups.push(ss);
+      }
+      //先判断当前元素
+      let cur_selector = selector_groups[selector_groups.length - 1];
+      matched = matchElement(cur_selector, element);
+      //再判断上层元素
+      if (matched) {
+        let j = selector_groups.length - 2;
+        element = element.previousElementSibling;
+        while (j >= 0) {
+          matched = matchElement(selector_groups[j], element);
+          if (matched) {
+            j--;
+          }
+          element = element.previousElementSibling;
+        }
+      }
+
+    } else {
+      //后代
+      let selector_array = selector.split(" ");
+      let selector_groups = [];
+      // array = [div, #id.class];
+      for (let i = 0; i < selector_array.length; i++) {
+        let ss = selector_array[i].match(selector_reg);
+        selector_groups.push(ss);
+      }
+      //先判断当前元素
+      let cur_selector = selector_groups[selector_groups.length - 1];
+      matched = matchElement(cur_selector, element);
+      //再判断上层元素
+      if (matched) {
+        let j = selector_groups.length - 2;
+        element = element.parentNode;
+        while (j >= 0) {
+          matched = matchElement(selector_groups[j], element);
+          if (matched) {
+            j--;
+          }
+          element = element.parentNode;
+        }
+      }
+    }
+    return matched;
+  }
+
+
+  function matchElement(selectors, element) {
+    let hasId = false, hasClass = false, hasTag = false;
+    let idMatch = false, clsMatch = false, tagMatch = false;
+
+    //[#id,.cls1,.cls2]   id="id",class="cls1 cls2"
+    for (let i = 0; i < selectors.length; i++) {
+      let selector = selectors[i];
+      if (selector.charAt(0) === "*") {
+        return true;
+      } else if (selector.charAt(0) === "#") {// #id
+        hasId = true;
+        if (element.id === selector.replace("#", '')) {
+          idMatch = true;
+        }
+      } else if (selector.charAt(0) === ".") {// .cls
+        hasClass = true;
+        let classList = element.classList;
+        for (let j = 0; j < classList.length; j++) {
+          if (classList[j] === selector.replace(".", '')) {
+            clsMatch = true;
+            break;
+          }
+        }
+
+      } else {
+        hasTag = true;
+        if (element.tagName.toUpperCase() === selector.toUpperCase()) {
+          tagMatch = true;
+        }
+      }
+    }
+
+    let res = true;
+    if ((hasId && !idMatch) || (hasClass && !clsMatch) || (hasTag && !tagMatch)) {
+      res = false;
+    }
+    return res;
+  }
+
+  console.log(match('div #app.a'))
+  </script>
+
+</body>
+</html>

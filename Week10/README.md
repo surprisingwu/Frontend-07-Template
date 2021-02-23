@@ -3,3 +3,4 @@
 
 #### 浏览器渲染
 * 浏览器接收到服务端返回的文件, 开始进行解析=>style=>layout=>pait=>composite.
+
